@@ -1,0 +1,243 @@
+﻿<helpers:RoundedMetroWindow
+    x:Class="PNGReaper.Views.ShellView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:PNGReaper.Helpers"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:PNGReaper.ViewModels"
+    Title="PNG Reaper"
+    Width="1000"
+    Height="650"
+    d:DataContext="{d:DesignInstance Type=viewModels:ShellViewModel}"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <Style x:Key="IconText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Text}" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <Rectangle Grid.Column="1" Fill="{DynamicResource MahApps.Brushes.Accent1}" />
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Margin="0,20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    FontSize="24"
+                    Text="PNG Reaper"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+
+                <Grid
+                    Grid.Row="1"
+                    Margin="5"
+                    AllowDrop="True"
+                    Background="Transparent"
+                    Drop="PNGDragDrop"
+                    PreviewDragOver="PNGPreviewDragOver"
+                    PreviewDrop="PNGPreviewDrop">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        AllowDrop="True"
+                        FontSize="20"
+                        Foreground="{DynamicResource MahApps.Brushes.Gray.SemiTransparent}"
+                        Text="Drag Image Here" />
+                    <Image AllowDrop="True" Source="{Binding ImageFile}" />
+                </Grid>
+
+                <Button
+                    Grid.Row="2"
+                    Margin="0,15"
+                    HorizontalAlignment="Center"
+                    Content="Load Local"
+                    Style="{StaticResource MahApps.Styles.Button.Flat}" />
+            </Grid>
+
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="2" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Margin="20">
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        FontSize="24"
+                        Text="Results"
+                        TextAlignment="Left"
+                        TextWrapping="Wrap" />
+                    <mah:MetroHeader Header="Prompt">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Height="66"
+                                IsReadOnly="True"
+                                Text="{Binding Prompt, Mode=OneWay}"
+                                TextWrapping="WrapWithOverflow" />
+                            <Button
+                                Grid.Column="1"
+                                Width="20"
+                                Height="20"
+                                VerticalAlignment="Top"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Command="{Binding CopyPrompt}">
+                                <Button.Content>
+                                    <TextBlock
+                                        FontSize="8"
+                                        Foreground="{DynamicResource MahApps.Brushes.Gray2}"
+                                        Style="{StaticResource IconText}"
+                                        Text="&#xE8C8;" />
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </mah:MetroHeader>
+                    <mah:MetroHeader Header="Negative Prompt">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Height="66"
+                                IsReadOnly="True"
+                                Text="{Binding NegativePrompt, Mode=OneWay}"
+                                TextWrapping="WrapWithOverflow" />
+                            <Button
+                                Grid.Column="1"
+                                Width="20"
+                                Height="20"
+                                VerticalAlignment="Top"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Command="{Binding CopyNegPrompt}">
+                                <Button.Content>
+                                    <TextBlock
+                                        FontSize="8"
+                                        Foreground="{DynamicResource MahApps.Brushes.Gray2}"
+                                        Style="{StaticResource IconText}"
+                                        Text="&#xE8C8;" />
+                                </Button.Content>
+                            </Button>
+
+                        </Grid>
+                    </mah:MetroHeader>
+
+                    <Rectangle
+                        Height="2"
+                        Margin="0,5"
+                        Fill="{DynamicResource MahApps.Brushes.Accent}" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <mah:MetroHeader Header="Sampler">
+                            <TextBox IsReadOnly="True" Text="{Binding Sampler, Mode=OneWay}" />
+                        </mah:MetroHeader>
+                        <mah:MetroHeader Grid.Column="2" Header="Seed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox IsReadOnly="True" Text="{Binding Seed, Mode=OneWay}" />
+                                <Button
+                                    Grid.Column="1"
+                                    Width="20"
+                                    Height="20"
+                                    VerticalAlignment="Top"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Command="{Binding CopySeed}">
+                                    <Button.Content>
+                                        <TextBlock
+                                            FontSize="8"
+                                            Foreground="{DynamicResource MahApps.Brushes.Gray2}"
+                                            Style="{StaticResource IconText}"
+                                            Text="&#xE8C8;" />
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </mah:MetroHeader>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <mah:MetroHeader Header="CFG Scale">
+                            <TextBox IsReadOnly="True" Text="{Binding CFG, Mode=OneWay}" />
+                        </mah:MetroHeader>
+                        <mah:MetroHeader Grid.Column="2" Header="Steps">
+                            <TextBox IsReadOnly="True" Text="{Binding Steps, Mode=OneWay}" />
+                        </mah:MetroHeader>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <mah:MetroHeader Header="Size">
+                            <TextBox IsReadOnly="True" Text="{Binding Size, Mode=OneWay}" />
+                        </mah:MetroHeader>
+                        <mah:MetroHeader Grid.Column="2" Header="Model Hash">
+                            <TextBox IsReadOnly="True" Text="{Binding ModelHash, Mode=OneWay}" />
+                        </mah:MetroHeader>
+                    </Grid>
+                    <Grid>
+                        <mah:MetroHeader Header="Model">
+                            <TextBox IsReadOnly="True" Text="{Binding Model, Mode=OneWay}" />
+                        </mah:MetroHeader>
+                    </Grid>
+                </StackPanel>
+
+                <Rectangle
+                    Grid.Row="1"
+                    Margin="20,0"
+                    Fill="{DynamicResource MahApps.Brushes.Accent}" />
+
+                <mah:MetroHeader
+                    Grid.Row="2"
+                    Margin="20"
+                    Header="RAW">
+                    <TextBox
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="{DynamicResource MahApps.Brushes.Gray9}"
+                        Text="{Binding Raw, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                </mah:MetroHeader>
+            </Grid>
+        </Grid>
+    </Grid>
+</helpers:RoundedMetroWindow>

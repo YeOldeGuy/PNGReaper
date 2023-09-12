@@ -1,25 +1,57 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using PNGReaper.Services.Abstract;
 using PNGReaper.ViewModels;
 
 namespace PNGReaper.Views;
 
 public partial class ShellView
 {
-    private ShellViewModel? _vm;
+    private readonly IPersistService        _persistService;
+    private readonly IWindowPositionService _positionService;
+    private          bool                   _activated;
+    private          ShellViewModel?        _vm;
 
-    public ShellView()
+    public ShellView(IPersistService persistService,
+        IWindowPositionService positionService)
     {
+        _persistService  = persistService;
+        _positionService = positionService;
         InitializeComponent();
         SetRoundedCorners();
     }
 
     protected override void OnActivated(EventArgs e)
     {
+        if (_activated) return;
+
+        _vm        = (ShellViewModel)DataContext;
+        _activated = true;
+
+        var pos = _persistService.StartPosition;
+
+        if (pos.length == 0)
+            _persistService.StartPosition = _positionService.GetPosition(this);
+        else
+            _positionService.SetPosition(this, pos);
+
         base.OnActivated(e);
-        _vm = (ShellViewModel)DataContext;
     }
+    
+    protected override void OnLocationChanged(EventArgs e)
+    {
+        // Don't do this if the window hasn't been activated yet. If
+        // you do, you'll just write the default position to the persist
+
+        if (!_activated)
+            return;
+
+        var pos = _positionService.GetPosition(this);
+        _persistService.StartPosition = pos;
+        _persistService.Save();
+    }
+
 
     private static bool IsPngInDropList(DataObject data)
     {
@@ -27,7 +59,8 @@ public partial class ShellView
         {
             var list = data.GetFileDropList();
             var first = list[0];
-            if (Path.HasExtension(".png")) return true;
+            if (Path.GetExtension(first)!.Equals(".png", StringComparison.InvariantCultureIgnoreCase))
+                return true;
         }
 
         return false;
@@ -48,10 +81,6 @@ public partial class ShellView
             if (IsPngInDropList(data))
                 e.Effects = DragDropEffects.All;
     }
-
-    // private void PNGDragEnter(object sender, DragEventArgs e)
-    // {
-    // }
 
     private void PNGDragDrop(object sender, DragEventArgs e)
     {

@@ -12,29 +12,34 @@ namespace PNGReaper.ViewModels;
 
 internal class ShellViewModel : BindableBase
 {
+    private readonly IPersistService  _persistService;
     private readonly IPngParseService _pngParseService;
+    private          string?          _cfg;
 
     private DelegateCommand? _CopyNegPrompt;
     private DelegateCommand? _CopyPrompt;
     private DelegateCommand? _CopySeed;
-    
+
     private string? _imageFile;
-    private string? _raw;
-    private string? _prompt;
-    private string? _negativePrompt;
-    private string? _steps;
-    private string? _sampler;
-    private string? _seed;
-    private string? _cfg;
     private string? _model;
     private string? _modelHash;
+    private string? _negativePrompt;
+    private string? _prompt;
+    private string? _raw;
+    private string? _sampler;
+    private string? _seed;
     private string? _size;
+    private string? _steps;
 
-    public ShellViewModel(IPngParseService pngParseService)
+    public ShellViewModel(IPngParseService pngParseService,
+        IPersistService persistService)
     {
         _pngParseService = pngParseService;
-        ImageFile             = 
-            @"C:\Users\kewal\StableDiffusion\webui\outputs\txt2img-images\2023-09-09\00121-1846211428.png";
+        _persistService  = persistService;
+
+        ImageFile = string.IsNullOrEmpty(_persistService.LastFile) 
+            ? @"C:\Users\kewal\StableDiffusion\webui\outputs\txt2img-images\2023-09-09\00121-1846211428.png" 
+            : _persistService.LastFile;
     }
 
     public string? ImageFile
@@ -144,6 +149,9 @@ internal class ShellViewModel : BindableBase
         var rawText = chunks.FirstOrDefault(c => c.ChunkType!.Equals("tEXt", StringComparison.OrdinalIgnoreCase));
         var allText = Encoding.ASCII.GetString(rawText.ChunkDataBytes);
 
+        _persistService.LastFile = filename;
+
         _pngParseService.SetText(allText);
+        _persistService.Save();
     }
 }

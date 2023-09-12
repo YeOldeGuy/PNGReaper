@@ -4,19 +4,13 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using PNGReaper.Helpers;
 using PNGReaper.Services.Abstract;
 
 namespace PNGReaper.Services.Actual;
 
 internal class FileService : IFileService
 {
-    private readonly string _baseDirectory;
-
-    public FileService(AppConfig appConfig)
-    {
-        _baseDirectory = appConfig.ConfigurationsFolder;
-    }
+    private const string _baseDirectory = @"PNGReaper\Configurations\";
 
     public void CreateDirectory(StorageStrategy strategy)
     {

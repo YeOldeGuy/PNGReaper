@@ -2,9 +2,12 @@
 
 namespace PNGReaper.Services.Abstract;
 
-internal interface IPersistService
+public interface IPersistService
 {
     AppTheme Theme { get; set; }
 
     WindowPlacement StartPosition { get; set; }
+
+    string LastFile { get; set; }
+    bool Save();
 }

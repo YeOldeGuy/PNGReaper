@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using PNGReaper.Helpers;
 using PNGReaper.Services.Abstract;
 using PNGReaper.ViewModels;
@@ -101,7 +102,16 @@ public partial class ShellView
                 e.Effects = DragDropEffects.All;
                 var list = data.GetFileDropList();
                 var first = list[0];
-                if (_vm is null) return;
+                if (_vm is null || first is null) return;
+
+                var bi = new BitmapImage();
+                bi.BeginInit();
+                bi.CacheOption   = BitmapCacheOption.OnLoad;
+                bi.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                bi.UriSource     = new Uri(first);
+                bi.EndInit();
+
+                pngImage.Source = bi;
                 _vm.ImageFile = first;
             }
 

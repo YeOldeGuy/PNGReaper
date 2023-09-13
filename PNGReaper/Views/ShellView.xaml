@@ -60,7 +60,7 @@
                         FontSize="20"
                         Foreground="{DynamicResource MahApps.Brushes.Gray.SemiTransparent}"
                         Text="Drag Image Here" />
-                    <Image AllowDrop="True" Source="{Binding ImageFile}" />
+                    <Image Name="pngImage" AllowDrop="True" Source="{Binding ImageFile}" />
                 </Grid>
 
                 <Button

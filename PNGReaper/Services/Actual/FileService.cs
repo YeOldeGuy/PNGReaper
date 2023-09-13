@@ -102,11 +102,9 @@ internal class FileService : IFileService
 
         var path = GetFilePath(filename, strategy);
         if (path is null)
-            // _logger.LogWarning("[FLS] {File} generated a null path", filename);
             return null;
 
         var data = File.ReadAllText(path);
-        // _logger.LogInformation("[FLS] Read {Count} bytes of data from {Path}", data.Length, path);
         return data;
     }
 
@@ -118,13 +116,9 @@ internal class FileService : IFileService
 
         var path = GetFilePath(filename, strategy);
         if (path is null)
-            // _logger.LogWarning("[FLS] {File} generated a null path", filename);
             return null;
 
-        using var reader = new StreamReader(path);
-        var data = await reader.ReadToEndAsync();
-        // _logger.LogInformation("Read [FLS] {Count} bytes of data from {Path}", data.Length, path);
-        return data;
+        return await File.ReadAllTextAsync(path);
     }
 
     public async Task<byte[]?> ReadAllBytesAsync(string? filename,
@@ -133,17 +127,11 @@ internal class FileService : IFileService
         if (filename == null)
             return null;
 
-        return await Task.Run(() =>
-        {
-            var path = GetFilePath(filename, strategy);
-            if (path is null)
-                // _logger.LogWarning("[FLS] {File} generated a null path", filename);
-                return null;
+        var path = GetFilePath(filename, strategy);
+        if (path is null)
+            return null;
 
-            var buf = File.ReadAllBytes(path);
-            // _logger.LogInformation("[FLS] Read {Count} bytes of data from {Path}", buf.Length, path);
-            return buf;
-        });
+        return await File.ReadAllBytesAsync(path);
     }
 
     public byte[]? ReadAllBytes(string? filename, StorageStrategy strategy = StorageStrategy.Local)
@@ -155,12 +143,9 @@ internal class FileService : IFileService
             return null;
         var path = GetFilePath(filename, strategy);
         if (path is null)
-            // _logger.LogWarning("[FLS] {File} generated a null path", filename);
             return null;
 
-        var data = File.ReadAllBytes(path);
-        // _logger.LogInformation("[FLS] Read {Count} bytes of data from {File}", data.Length, path);
-        return data;
+        return File.ReadAllBytes(path);
     }
 
     public bool WriteAllText(string? contents,
@@ -174,7 +159,6 @@ internal class FileService : IFileService
         if (path is null)
             return false;
         File.WriteAllText(path, contents, Encoding.UTF8);
-        // _logger.LogInformation("[FLS] FileService.WriteAllText wrote {No} chars to {Name}", contents.Length, filename);
         return FileExists(path, strategy);
     }
 
@@ -211,14 +195,12 @@ internal class FileService : IFileService
 
         var path = GetFilePath(filename, strategy);
         if (path is null)
-            // _logger.LogWarning("[FLS] {File} generated a null path", filename);
             return false;
 
         await using (var writer = new FileStream(path, FileMode.OpenOrCreate))
         {
             await writer.WriteAsync(buffer, 0, buffer.Length);
             writer.Flush();
-            // _logger.LogInformation("[FLS] Wrote {Count} bytes to {Path}", buffer.Length, path);
         }
 
         return await FileExistsAsync(filename, strategy);
@@ -233,13 +215,11 @@ internal class FileService : IFileService
 
         var path = GetFilePath(filename, strategy);
         if (path is null)
-            // _logger.LogWarning("[FLS] {File} generated a null path", filename);
             return false;
 
         await using (var outStream = new FileStream(path, FileMode.OpenOrCreate))
         {
             await stream.CopyToAsync(outStream);
-            // _logger.LogInformation("[FLS] Wrote stream to {Path}", path);
         }
 
         return await FileExistsAsync(filename, strategy);

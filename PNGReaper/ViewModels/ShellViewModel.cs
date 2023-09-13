@@ -50,7 +50,7 @@ internal class ShellViewModel : BindableBase
         get => _imageFile;
         set
         {
-            if (_fileService.FileExists(value))
+            if (File.Exists(value))
             {
                 SetProperty(ref _imageFile, value);
                 ParsePNG(value);
@@ -165,7 +165,12 @@ internal class ShellViewModel : BindableBase
         if (string.IsNullOrEmpty(filename)) 
             return;
 
-        var chunks = PngReader.ReadBytes(File.ReadAllBytes(filename)).ToList();
+        if (!File.Exists(filename))
+            return;
+
+        var bytes = File.ReadAllBytes(filename);
+
+        var chunks = PngReader.ReadBytes(bytes).ToList();
         var rawText = chunks.FirstOrDefault(c => c.ChunkType!.Equals("tEXt", StringComparison.Ordinal));
         var allText = Encoding.ASCII.GetString(rawText.ChunkDataBytes);
 
@@ -173,5 +178,7 @@ internal class ShellViewModel : BindableBase
 
         _pngParseService.SetText(allText);
         _persistService.Save();
+        
+        bytes = null;
     }
 }

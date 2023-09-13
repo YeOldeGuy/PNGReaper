@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using PNGReaper.Helpers;
 using PNGReaper.Services.Abstract;
 using PNGReaper.ViewModels;
+using Prism.Events;
 
 namespace PNGReaper.Views;
 
@@ -26,6 +28,8 @@ public partial class ShellView
     {
         if (_activated) return;
 
+        SizeChanged += OnSizeChanged;
+        
         _vm        = (ShellViewModel)DataContext;
         _activated = true;
 
@@ -38,7 +42,14 @@ public partial class ShellView
 
         base.OnActivated(e);
     }
-    
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        var pos = _positionService.GetPosition(this);
+        _persistService.StartPosition = pos;
+        _persistService.Save();
+    }
+
     protected override void OnLocationChanged(EventArgs e)
     {
         // Don't do this if the window hasn't been activated yet. If
@@ -51,7 +62,6 @@ public partial class ShellView
         _persistService.StartPosition = pos;
         _persistService.Save();
     }
-
 
     private static bool IsPngInDropList(DataObject data)
     {

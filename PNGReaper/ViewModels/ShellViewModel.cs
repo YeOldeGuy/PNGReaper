@@ -14,6 +14,7 @@ internal class ShellViewModel : BindableBase
 {
     private readonly IPersistService  _persistService;
     private readonly IPngParseService _pngParseService;
+    private readonly IFileService _fileService;
     private          string?          _cfg;
 
     private DelegateCommand? _CopyNegPrompt;
@@ -32,10 +33,12 @@ internal class ShellViewModel : BindableBase
     private string? _steps;
 
     public ShellViewModel(IPngParseService pngParseService,
-        IPersistService persistService)
+        IPersistService persistService,
+        IFileService fileService)
     {
         _pngParseService = pngParseService;
         _persistService  = persistService;
+        _fileService = fileService;
 
         ImageFile = string.IsNullOrEmpty(_persistService.LastFile) 
             ? @"C:\Users\kewal\StableDiffusion\webui\outputs\txt2img-images\2023-09-09\00121-1846211428.png" 
@@ -47,19 +50,35 @@ internal class ShellViewModel : BindableBase
         get => _imageFile;
         set
         {
-            SetProperty(ref _imageFile, value);
-            ParsePNG(value);
+            if (_fileService.FileExists(value))
+            {
+                SetProperty(ref _imageFile, value);
+                ParsePNG(value);
 
-            Raw            = _pngParseService.RawData;
-            Prompt         = _pngParseService.Prompt;
-            NegativePrompt = _pngParseService.NegativePrompt;
-            Seed           = _pngParseService.Seed;
-            Size           = _pngParseService.Size;
-            Model          = _pngParseService.Model;
-            ModelHash      = _pngParseService.ModelHash;
-            CFG            = _pngParseService.CFGScale;
-            Sampler        = _pngParseService.Sampler;
-            Steps          = _pngParseService.Steps;
+                Raw = _pngParseService.RawData;
+                Prompt = _pngParseService.Prompt;
+                NegativePrompt = _pngParseService.NegativePrompt;
+                Seed = _pngParseService.Seed;
+                Size = _pngParseService.Size;
+                Model = _pngParseService.Model;
+                ModelHash = _pngParseService.ModelHash;
+                CFG = _pngParseService.CFGScale;
+                Sampler = _pngParseService.Sampler;
+                Steps = _pngParseService.Steps;
+            }
+            else
+            {
+                Raw = string.Empty;
+                Prompt = string.Empty;
+                NegativePrompt = string.Empty;
+                Seed = string.Empty;
+                Size = string.Empty;
+                Model = string.Empty;
+                ModelHash = string.Empty;
+                CFG = string.Empty;
+                Sampler = string.Empty;
+                Steps = string.Empty;
+            }
         }
     }
 
@@ -143,10 +162,11 @@ internal class ShellViewModel : BindableBase
 
     private void ParsePNG(string? filename)
     {
-        if (filename == null) throw new ArgumentNullException(nameof(filename));
+        if (string.IsNullOrEmpty(filename)) 
+            return;
 
         var chunks = PngReader.ReadBytes(File.ReadAllBytes(filename)).ToList();
-        var rawText = chunks.FirstOrDefault(c => c.ChunkType!.Equals("tEXt", StringComparison.OrdinalIgnoreCase));
+        var rawText = chunks.FirstOrDefault(c => c.ChunkType!.Equals("tEXt", StringComparison.Ordinal));
         var allText = Encoding.ASCII.GetString(rawText.ChunkDataBytes);
 
         _persistService.LastFile = filename;

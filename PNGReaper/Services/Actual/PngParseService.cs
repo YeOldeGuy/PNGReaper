@@ -27,6 +27,9 @@ internal class PngParseService : IPngParseService
             if (string.IsNullOrEmpty(RawData))
                 return null;
             var index = RawData.IndexOf(_negativePrompt, StringComparison.OrdinalIgnoreCase);
+            if (index < 0)
+                return string.Empty;
+
             var p = RawData[..index];
             return p.Trim();
         }
@@ -39,10 +42,13 @@ internal class PngParseService : IPngParseService
             if (string.IsNullOrEmpty(RawData))
                 return null;
 
-            var nIndex = RawData.IndexOf(_negativePrompt, StringComparison.OrdinalIgnoreCase) +
+            var negIndex = RawData.IndexOf(_negativePrompt, StringComparison.OrdinalIgnoreCase) +
                          _negativePrompt.Length;
-            var sIndex = RawData.IndexOf(_stepsPrompt, StringComparison.OrdinalIgnoreCase);
-            var s = RawData[nIndex..sIndex];
+            var stepsIndex = RawData.IndexOf(_stepsPrompt, StringComparison.OrdinalIgnoreCase);
+
+            if (negIndex < 0 || stepsIndex < 0 || stepsIndex <= negIndex) return string.Empty;
+
+            var s = RawData[negIndex..stepsIndex];
             return s.Trim();
         }
     }
@@ -60,6 +66,8 @@ internal class PngParseService : IPngParseService
     private static string CopyToNullByte(ReadOnlySpan<char> chars)
     {
         var index = chars.IndexOf('\0');
+        if (index < 0)
+            return string.Empty;
         var slice = chars[..index];
         return new string(slice);
     }
@@ -73,6 +81,6 @@ internal class PngParseService : IPngParseService
         if (start < 0 || start > RawData.Length)
             return "";
         var end = RawData.IndexOf(',', start);
-        return RawData.Substring(start, end - start).Trim();
+        return end < 0 ? string.Empty : RawData[start..end].Trim();
     }
 }

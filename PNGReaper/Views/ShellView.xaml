@@ -96,7 +96,8 @@
                                 Height="66"
                                 IsReadOnly="True"
                                 Text="{Binding Prompt, Mode=OneWay}"
-                                TextWrapping="WrapWithOverflow" />
+                                TextWrapping="WrapWithOverflow"
+                                VerticalScrollBarVisibility="Auto" />
                             <Button
                                 Grid.Column="1"
                                 Width="20"
@@ -125,7 +126,8 @@
                                 Height="66"
                                 IsReadOnly="True"
                                 Text="{Binding NegativePrompt, Mode=OneWay}"
-                                TextWrapping="WrapWithOverflow" />
+                                TextWrapping="WrapWithOverflow"
+                                VerticalScrollBarVisibility="Auto" />
                             <Button
                                 Grid.Column="1"
                                 Width="20"
@@ -235,7 +237,8 @@
                         VerticalAlignment="Stretch"
                         Background="{DynamicResource MahApps.Brushes.Gray9}"
                         Text="{Binding Raw, Mode=OneWay}"
-                        TextWrapping="Wrap" />
+                        TextWrapping="Wrap"
+                        VerticalScrollBarVisibility="Auto" />
                 </mah:MetroHeader>
             </Grid>
         </Grid>
